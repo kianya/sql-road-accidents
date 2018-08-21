@@ -1,0 +1,15 @@
+id,name,alias
+1,Наезд на пешехода,naezd-na-peshekhoda
+2,Столкновение,stolknovenie
+3,Наезд на препятствие,naezd-na-prepiatstvie
+4,Наезд на стоящее ТС,naezd-na-stoiashchee-ts
+5,Наезд на велосипедиста,naezd-na-velosipedista
+6,Падение пассажира,padenie-passazhira
+7,Опрокидывание,oprokidyvanie
+8,Съезд с дороги,sezd-s-dorogi
+9,"Наезд на лицо, не являющееся участником дорожного движения, осуществляющее какую-либо другую деятельность",naezd-na-litso-ne-iavliaiushcheesia-uchastnikom-dorozhnogo-dvizheniia-osushchestvliaiushchee-kakuiu-libo-druguiu-deiatelnost
+10,Иной вид ДТП,inoi-vid-dtp
+11,Отбрасывание предмета,otbrasyvanie-predmeta
+12,"Наезд на лицо, не являющееся участником дорожного движения, осуществляющее производство работ",naezd-na-litso-ne-iavliaiushcheesia-uchastnikom-dorozhnogo-dvizheniia-osushchestvliaiushchee-proizvodstvo-rabot
+13,Падение груза,padenie-gruza
+14,Наезд на животное,naezd-na-zhivotnoe
