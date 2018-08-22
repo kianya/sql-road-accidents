@@ -13,6 +13,7 @@ USER jovyan
 # e.g., RUN pip install jupyter_dashboards
 
 # running notebook with password ''
+RUN conda install psycopg2 -y
 
 RUN yes | jupyter notebook --generate-config
 RUN echo "c.NotebookApp.password = 'sha1:e96e48af7c0d:4df487a2149398c594b6f6aadec1443f4cc5663c'">>/home/jovyan/.jupyter/jupyter_notebook_config.py
