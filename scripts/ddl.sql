@@ -42,12 +42,7 @@ CREATE TABLE IF NOT EXISTS public.f_accident
     address character varying(1000),
     longitude double precision,
     latitude double precision,
-    dead integer,
-    injured integer,
     type_id integer,
-    alias character varying(1000) ,
-    scheme character varying(100) ,
-    participants integer,
     geo_updated boolean NOT NULL,
     created_at timestamp with time zone NOT NULL,
     CONSTRAINT dtpmapapp_mvc_type_id_4fbc8b7c_fk_dtpmapapp_mvctype_id FOREIGN KEY (type_id)
