@@ -58,37 +58,39 @@ FROM public.d_participant
 	WHERE car_id IS NOT NULL
 ) t
 WHERE count_death>0
-ORDER BY count_participant DESC, mvc_id;
+ORDER BY count_participant DESC, mvc_id
+LIMIT 10;
 
 -- Аналитические функции. Для каждого участника ДТП выбрать количество общее количество участников, количество машин, учавствовавших в ДТП и тип участника
 SELECT d_participant.mvc_id,
-		d_participant.role,
-		d_participant.gender,
-		d_participant.status,
-		COUNT(1) OVER (PARTITION BY mvc_id) as count_participants,
-		SUM(CASE WHEN d_participant.role = 'Водитель' then 0 else 1 end) 
-			OVER (PARTITION BY mvc_id, car_id) as count_passengers,
-		SUM(CASE WHEN d_participant.role = 'Водитель' then 1 else 0 end)
-			OVER (PARTITION BY mvc_id) as count_cars
-FROM public.d_participant;
+        d_participant.role,
+        d_participant.gender,
+        COUNT(1) OVER (PARTITION BY mvc_id) as count_participants,
+        SUM(CASE WHEN d_participant.role = 'Пассажир' then 1 else 0 end) 
+            OVER (PARTITION BY mvc_id) as count_passengers,
+        SUM(CASE WHEN d_participant.role = 'Водитель' then 1 else 0 end)
+            OVER (PARTITION BY mvc_id) as count_cars
+FROM public.d_participant 
+limit 20;
+
 
 -- Аналитические функции. Установить, с какой средней частотой происходят аварии на различных улицах москвы.
 WITH t as (
 SELECT split_part(address, ',', 2) as street,
-	    COALESCE(LEAD(datetime) OVER 
-				(PARTITION BY split_part(address, ',', 1), 
-							   split_part(address, ',', 2)
-				 ORDER BY datetime
-				), datetime)
-		- datetime as interval_between
+            COALESCE(LEAD(datetime) OVER 
+                    (PARTITION BY split_part(address, ',', 1), 
+                                   split_part(address, ',', 2)
+                     ORDER BY datetime
+                    ), datetime)
+            - datetime as interval_between
 FROM public.f_accident
-	WHERE address IS NOT NULL
-		  AND lower(split_part(address, ',', 1)) like '%москва%'
-	)
+        WHERE address IS NOT NULL
+              AND lower(split_part(address, ',', 1)) like '%москва%')
 SELECT street, AVG(interval_between) as avg_interval FROM t
         WHERE interval_between > 0 * interval '1 day'
-		GROUP BY street
-		ORDER BY 2;
+            GROUP BY street
+            ORDER BY 2
+            LIMIT 5;
 
 -- 5. Выбрать среднее количество участников ДТП и среднее количество смертей на 1 ДТП
 SELECT AVG(sum_participant) as avg_participant, AVG(sum_death) as avg_death
@@ -98,8 +100,8 @@ FROM (SELECT  mvc_id
 	FROM public.d_participant
 			LEFT JOIN public.d_car
 				ON d_car.id = d_participant.car_id
-		GROUP BY mvc_id) t;
-
+		GROUP BY mvc_id) t
+LIMIT 10;
 
 -- 6. Выбрать ТОП-5 цветов машин, которые участвовали в ДТП
 SELECT d_car.color, COUNT(1) cnt
@@ -133,18 +135,20 @@ SELECT f_accident.id, f_accident.datetime, f_accident.longitude,
 FROM public.f_accident
 	LEFT JOIN public.d_accident_type
 		ON f_accident.type_id = d_accident_type.id
-WHERE name = 'Наезд на животное';
+WHERE name = 'Наезд на животное'
+LIMIT 10;
 
 
 -- 10. Выбрать все ДТП в которых погиб пассажир 
 WITH t as
 (SELECT mvc_id, 
- 		 SUM(case when lower(status) like '%скончался%' then 1 else 0 end) as count_death
- 	FROM public.d_participant
-	GROUP BY mvc_id
-)
+             SUM(case when lower(status) like '%скончался%' then 1 else 0 end) as count_death
+        FROM public.d_participant
+        GROUP BY mvc_id)
 SELECT f_accident.id, datetime, longitude, latitude, count_death 
 FROM public.f_accident
-	LEFT JOIN t 
-		ON f_accident.id = t.mvc_id
-		WHERE count_death > 0;
+        LEFT JOIN t 
+            ON f_accident.id = t.mvc_id
+            WHERE count_death > 0
+            order by 1
+            limit 5;
